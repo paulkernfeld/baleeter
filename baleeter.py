@@ -11,6 +11,7 @@ from os import walk
 from os.path import expanduser
 from os.path import join
 from shutil import rmtree
+from textwrap import dedent
 
 # Offset by 12 hours so that this triggers once when you start working, not
 # frequently in the middle of work.
@@ -61,19 +62,28 @@ for file_path, file_stat in files_by_age:
     if file_age > max_file_age:
         n_considered += 1
         while True:
-            may_delete = input("Baleet {} {}, from {} ago?\ny: Delete\nn: Don't delete\no: Open\n\n>>> ".format(file_dir_str, file_path, str(file_age)))
-            if may_delete in {"y", "Y"}:
+            action = input(dedent("""
+                Baleet {} {}, from {} ago?
+                y: Delete
+                n: Don't delete
+                o: Open
+                q: Quit
+
+                >>> """).format(file_dir_str, file_path, str(file_age)))
+            if action in {"y", "Y"}:
                 if is_dir:
                     rmtree(file_path)
                 else:
                     remove(file_path)
                 print("{} baleeted!\n\n".format(file_path))
                 break
-            elif may_delete in {"o", "O"}:
+            elif action in {"o", "O"}:
                 call(["open", file_path])
-            elif may_delete in {"n", "N"}:
+            elif action in {"n", "N"}:
                 utime(file_path, None)
                 print("{} not baleeted!\n\n".format(file_path))
                 break
+            elif action in {"q", "Q"}:
+                exit()
             else:
-                print("Flagrant user error: input {}".format(may_delete))
+                print("Flagrant user error: input {}".format(action))
