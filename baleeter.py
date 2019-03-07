@@ -3,6 +3,7 @@ import stat
 from datetime import datetime
 from datetime import timedelta
 from subprocess import call
+from os import environ
 from os import listdir
 from os import remove
 from os import stat as os_stat
@@ -66,6 +67,7 @@ for file_path, file_stat in files_by_age:
                 Baleet {} {}, from {} ago?
                 y: Delete
                 n: Don't delete
+                e: Open with $EDITOR
                 o: Open
                 q: Quit
 
@@ -79,6 +81,8 @@ for file_path, file_stat in files_by_age:
                 break
             elif action in {"o", "O"}:
                 call(["open", file_path])
+            elif action in {"e", "E"}:
+                call([environ["EDITOR"], file_path])
             elif action in {"n", "N"}:
                 utime(file_path, None)
                 print("{} not baleeted!\n\n".format(file_path))
